@@ -2654,7 +2654,10 @@ static int alloc_tree_block(struct btrfs_trans_handle *trans,
 
 	ret = btrfs_reserve_extent(trans, root, num_bytes, empty_size,
 				   hint_byte, search_end, ins, 0);
-	BUG_ON(ret);
+	if (ret < 0) {
+		btrfs_free_delayed_extent_op(extent_op);
+		return ret;
+	}
 
 	if (key)
 		memcpy(&extent_op->key, key, sizeof(extent_op->key));
